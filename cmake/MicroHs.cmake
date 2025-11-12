@@ -15,9 +15,10 @@ function(fetch_and_build_microhs MICROHS_BIN MICROHS_SRC_DIR)
     ExternalProject_Add(MicroHsProject
         URL ${MICROHS_URL}
         DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+        BUILD_IN_SOURCE TRUE
         PREFIX ${MICROHS_PREFIX}
         CONFIGURE_COMMAND ""
-        BUILD_COMMAND make -f ${MICROHS_MAKEFILE} -C <SOURCE_DIR> ${MICROHS_MHS_BIN}
+        BUILD_COMMAND make -f ${MICROHS_MAKEFILE} ${MICROHS_MHS_BIN}
         INSTALL_COMMAND ""
     )
 
