@@ -25,10 +25,10 @@ function(build_and_install_libmhs MICROHS_BIN MICROHS_SRC_DIR)
     set(REPL_O "${CMAKE_CURRENT_BINARY_DIR}/Repl.o")
     set(EVAL_O "${CMAKE_CURRENT_BINARY_DIR}/eval.o")
 
-    if(WIN32)
-      set(MICROHS_OS_RUNtIME_DIR "${MICROHS_SRC_DIR}/src/runtime/windows")
+    if(CMAKE_HOST_WIN32)
+      set(MICROHS_OS_RUNTIME_DIR "${MICROHS_SRC_DIR}/src/runtime/windows")
     else()
-      set(MICROHS_OS_RUNtIME_DIR "${MICROHS_SRC_DIR}/src/runtime/unix")
+      set(MICROHS_OS_RUNTIME_DIR "${MICROHS_SRC_DIR}/src/runtime/unix")
     endif()
 
     add_custom_command(
@@ -54,7 +54,7 @@ function(build_and_install_libmhs MICROHS_BIN MICROHS_SRC_DIR)
         DEPENDS ${REPL_C}
         COMMAND ${CMAKE_C_COMPILER} -w -Wall -O3 -c
                 -I${MICROHS_SRC_DIR}/src/runtime
-                -I${MICROHS_OS_RUNtIME_DIR}
+                -I${MICROHS_OS_RUNTIME_DIR}
                 -D__MHS__
                 ${MICROHS_SRC_DIR}/src/runtime/eval.c
                 -o ${EVAL_O}
@@ -67,7 +67,7 @@ function(build_and_install_libmhs MICROHS_BIN MICROHS_SRC_DIR)
         DEPENDS ${REPL_C}
         COMMAND ${CMAKE_C_COMPILER} -w -Wall -O3 -c
                 -I${MICROHS_SRC_DIR}/src/runtime
-                -I${MICROHS_OS_RUNtIME_DIR}
+                -I${MICROHS_OS_RUNTIME_DIR}
                 -D__MHS__
                 ${REPL_C}
                 -o ${REPL_O}
