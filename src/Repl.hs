@@ -74,11 +74,29 @@ initialCtx = do
 defsSource :: [StoredDef] -> String
 defsSource = concatMap sdCode
 
+currentDefsSource :: ReplCtx -> String
+currentDefsSource = defsSource . rcDefs
+
+moduleSourceWith :: ReplCtx -> String -> String
+moduleSourceWith ctx extra = buildModule (currentDefsSource ctx ++ extra)
+
+moduleFromDefs :: [StoredDef] -> String
+moduleFromDefs defs = buildModule (defsSource defs)
+
 stripRedefined :: [StoredDef] -> [Ident] -> [StoredDef]
 stripRedefined defs [] = defs
 stripRedefined defs names = filter noOverlap defs
   where
     noOverlap def = all (`notElem` names) (sdNames def)
+
+appendDefinition :: ReplCtx -> String -> Either ReplError [StoredDef]
+appendDefinition ctx snippet =
+    case extractDefinitionNames snippet of
+        Left err -> Left err
+        Right names ->
+            let uniqueNames = nub names
+                retainedDefs = stripRedefined (rcDefs ctx) uniqueNames
+            in Right (retainedDefs ++ [StoredDef snippet uniqueNames])
 
 --------------------------------------------------------------------------------
 -- Error
@@ -200,23 +218,18 @@ runAction cache cmdl ident = do
 replDefine :: ReplCtx -> String -> IO (Either ReplError ReplCtx)
 replDefine ctx snippet = do
   let snippet' = ensureTrailingNewline snippet
-  namesResult <- pure (extractDefinitionNames snippet')
-  case namesResult of
-    Left perr -> pure (Left (ReplParseError perr))
-    Right names -> do
-      let uniqueNames = nub names
-          retainedDefs = stripRedefined (rcDefs ctx) uniqueNames
-          defsWithNew = retainedDefs ++ [StoredDef snippet' uniqueNames]
-          src = buildModule (defsSource defsWithNew)
-      cm <- compileModule ctx src
+  case appendDefinition ctx snippet' of
+    Left err -> pure (Left err)
+    Right defsWithNew -> do
+      cm <- compileModule ctx (moduleFromDefs defsWithNew)
       case cm of
-        Left err          -> pure (Left err)
+        Left err'          -> pure (Left err')
         Right (_, cache') -> pure (Right ctx{ rcDefs = defsWithNew, rcCache = cache' })
 
 replRun :: ReplCtx -> String -> IO (Either ReplError ReplCtx)
 replRun ctx stmt = do
   let block = runBlock stmt
-      src = buildModule (defsSource (rcDefs ctx) ++ block)
+      src = moduleSourceWith ctx block
   cm <- compileModule ctx src
   case cm of
     Left err -> pure (Left err)
@@ -241,7 +254,7 @@ mhsReplExecute = runReplAction replExecute
 
 replExecute :: ReplCtx -> String -> IO (Either ReplError ReplCtx)
 replExecute ctx snippet =
-  let candidateDefs = defsSource (rcDefs ctx) ++ ensureTrailingNewline snippet
+  let candidateDefs = currentDefsSource ctx ++ ensureTrailingNewline snippet
   in
     if canParseDefinition candidateDefs
       then replDefine ctx snippet
@@ -275,10 +288,10 @@ canParseExpression snippet =
     Right _ -> True
     Left _  -> False
 
-extractDefinitionNames :: String -> Either String [Ident]
+extractDefinitionNames :: String -> Either ReplError [Ident]
 extractDefinitionNames snippet =
   case parse pTopModule "<xhaskell-define-names>" (buildModule snippet) of
-    Left err -> Left err
+    Left err -> Left (ReplParseError err)
     Right mdl -> Right (definitionNamesFromModule mdl)
 
 definitionNamesFromModule :: EModule -> [Ident]
