@@ -1,4 +1,3 @@
-#include <expected>
 #include <functional>
 #include <string>
 #include <string_view>
@@ -193,7 +192,7 @@ MicroHsRepl::~MicroHsRepl() {
     mhs_repl_free(context);
 }
 
-std::expected<std::string, std::string> MicroHsRepl::execute(std::string_view code) {
+repl_result MicroHsRepl::execute(std::string_view code) {
     std::string output;
     try {
         output = capture_stdout([&]() {
@@ -214,9 +213,9 @@ std::expected<std::string, std::string> MicroHsRepl::execute(std::string_view co
             if (err) mhs_repl_free_cstr(err);
         });
     } catch (const std::runtime_error& e) {
-        return std::unexpected(e.what());
+        return {false, std::string(), std::string(e.what())};
     }
-    return output;
+    return {true, std::move(output), std::string()};
 }
 
 } // namespace xeus_haskell

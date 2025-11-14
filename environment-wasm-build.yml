@@ -4,4 +4,7 @@ channels:
   - conda-forge
 dependencies:
   - cmake
+  - make
+  - c-compiler
+  - cxx-compiler
   - emscripten_emscripten-wasm32==3.1.73

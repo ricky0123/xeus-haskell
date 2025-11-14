@@ -1,17 +1,23 @@
 #pragma once
-#include <expected>
 #include <string>
 #include <string_view>
 #include "Repl_stub.h"
 
 namespace xeus_haskell {
 
+struct repl_result
+{
+    bool ok;
+    std::string output;
+    std::string error;
+};
+
 class MicroHsRepl {
 public:
     MicroHsRepl(); // calls mhs_init() and mhs_repl_new()
     ~MicroHsRepl(); // calls mhs_repl_free()
 
-    std::expected<std::string, std::string> execute(std::string_view code);
+    repl_result execute(std::string_view code);
 
 private:
     uintptr_t context = 0;

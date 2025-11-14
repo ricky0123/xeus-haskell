@@ -43,34 +43,35 @@ int main() {
         auto& repl = repl_instance();
         auto result = repl.execute("1 + 1");
 
-        expect_trim_eq(result.value(), "2");
+        expect(result.ok);
+        expect_trim_eq(result.output, "2");
     };
 
     "stdout is captured"_test = [] {
         announce("stdout is captured");
         auto& repl = repl_instance();
         auto res = repl.execute("putStrLn \"hello from repl\"");
-        expect(res.has_value());
-        expect(that % res.value().find("hello from repl") != std::string::npos);
+        expect(res.ok);
+        expect(that % res.output.find("hello from repl") != std::string::npos);
     };
 
     "definitions persist"_test = [] {
         announce("definitions persist");
         auto& repl = repl_instance();
         auto def_result = repl.execute("xh_def_test = 40 + 2");
-        expect(def_result.has_value());
+        expect(def_result.ok);
 
         auto res = repl.execute("xh_def_test");
-        expect(res.has_value());
-        expect_trim_eq(res.value(), "42");
+        expect(res.ok);
+        expect_trim_eq(res.output, "42");
     };
 
     "expressions evaluate"_test = [] {
         announce("expressions evaluate");
         auto& repl = repl_instance();
         auto res = repl.execute("let (a, b) = (10, 20) in a + b");
-        expect(res.has_value());
-        expect_trim_eq(res.value(), "30");
+        expect(res.ok);
+        expect_trim_eq(res.output, "30");
     };
 
     "measure warm-up timing"_test = [] {
@@ -87,8 +88,8 @@ int main() {
         auto [first, first_ms] = measure("21 + 21");
         auto [second, second_ms] = measure("22 + 22");
 
-        expect(first.has_value());
-        expect(second.has_value());
+        expect(first.ok);
+        expect(second.ok);
 
         std::cout << "[timing] MicroHsRepl execute timings (ms): first="
                   << first_ms << " second=" << second_ms << std::endl;

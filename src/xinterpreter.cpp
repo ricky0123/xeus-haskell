@@ -9,7 +9,6 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <expected>
 #include <stdexcept>
 
 #include "nlohmann/json.hpp"
@@ -36,24 +35,24 @@ namespace xeus_haskell
                                            xeus::execute_request_config config,
                                            nl::json /*user_expressions*/)
     {
-        auto repl_result = [&]() -> std::expected<std::string, std::string> {
+        auto exec_result = [&]() -> repl_result {
             try
             {
                 return m_repl.execute(code);
             }
             catch (const std::exception& e)
             {
-                return std::unexpected(std::string(e.what()));
+                return {false, std::string(), std::string(e.what())};
             }
             catch (...)
             {
-                return std::unexpected(std::string("Unknown MicroHs error"));
+                return {false, std::string(), std::string("Unknown MicroHs error")};
             }
         }();
 
-        if (!repl_result.has_value())
+        if (!exec_result.ok)
         {
-            const std::string& error_msg = repl_result.error();
+            const std::string& error_msg = exec_result.error;
             const std::vector<std::string> traceback{error_msg};
             publish_execution_error("RuntimeError", error_msg, traceback);
 
@@ -66,7 +65,7 @@ namespace xeus_haskell
 
         if (!config.silent)
         {
-            const std::string& output = repl_result.value();
+            const std::string& output = exec_result.output;
             if (!output.empty())
             {
                 nl::json pub_data;

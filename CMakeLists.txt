@@ -8,7 +8,7 @@
 
 cmake_minimum_required(VERSION 3.10.0)
 project(xeus-haskell)
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -411,4 +411,3 @@ if(NOT EMSCRIPTEN)
     target_link_libraries(test_mhs_repl PRIVATE mhs_repl_lib Boost::ut)
     add_test(NAME test_mhs_repl COMMAND test_mhs_repl)
 endif()
-

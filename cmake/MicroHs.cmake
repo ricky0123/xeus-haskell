@@ -74,6 +74,9 @@ function(build_and_install_libmhs MICROHS_BIN MICROHS_SRC_DIR)
       ${CMAKE_BINARY_DIR}
     )
     target_compile_definitions(repl_obj PRIVATE __MHS__)
+    if(EMSCRIPTEN)
+        target_compile_options(repl_obj PRIVATE -fPIC)
+    endif()
 
     add_library(eval_obj OBJECT ${EVAL_C})
     set_source_files_properties(${EVAL_C} PROPERTIES GENERATED TRUE)
@@ -84,6 +87,9 @@ function(build_and_install_libmhs MICROHS_BIN MICROHS_SRC_DIR)
       ${CMAKE_BINARY_DIR}
     )
     target_compile_definitions(eval_obj PRIVATE __MHS__)
+    if(EMSCRIPTEN)
+        target_compile_options(eval_obj PRIVATE -fPIC)
+    endif()
 
     add_library(mhs_obj STATIC
         $<TARGET_OBJECTS:repl_obj>
