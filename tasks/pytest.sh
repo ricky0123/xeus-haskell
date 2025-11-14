@@ -1,2 +1,2 @@
-#!/bin/bash
-docker run --rm -it -v $(pwd):/host xeus-haskell pytest
+#!/usr/bin/env bash
+docker run --rm -i -v $(pwd):/host xeus-haskell pytest
