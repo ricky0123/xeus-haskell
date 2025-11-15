@@ -67,7 +67,7 @@ jobs:
           export MHSDIR=$BUILD_DIR/microhs/src/MicroHsProject
 
           jupyter lite build \
-              --XeusAddon.prefix=${{ env.PREFIX }} \
+              --XeusAddon.prefix=$PREFIX \
               --XeusAddon.mounts=$MHSDIR:$MHSDIR \
               --output-dir dist
 
