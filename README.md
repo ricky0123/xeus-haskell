@@ -1,9 +1,6 @@
-# ![xeus-haskell](docs/source/xeus-logo.svg)
+# ![xeus-haskell](xeus-logo.svg)
 
-[![Build Status](https://github.com/tani/xeus-haskell/actions/workflows/main.yml/badge.svg)](https://github.com/tani/xeus-haskell/actions/workflows/main.yml)
-
-[![Documentation Status](http://readthedocs.org/projects/xeus-haskell/badge/?version=latest)](https://xeus-haskellreadthedocs.io/en/latest/?badge=latest)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/tani/xeus-haskell/main?urlpath=/lab/tree/notebooks/xeus-haskell.ipynb)
+[![Build Status](https://github.com/tani/xeus-haskell/actions/workflows/main.yml/badge.svg)](https://github.com/tani/xeus-haskell/actions/workflows/main.y
 
 `xeus-haskell` is a Jupyter kernel for haskell based on the native implementation of the
 Jupyter protocol [xeus](https://github.com/jupyter-xeus/xeus).
@@ -51,26 +48,17 @@ cmake .. -D CMAKE_PREFIX_PATH=$CONDA_PREFIX -D CMAKE_INSTALL_PREFIX=$CONDA_PREFI
 make && make install
 ```
 
-<!-- ## Trying it online
+## Trying it online
 
 To try out xeus-haskell interactively in your web browser, just click on the binder link:
-(Once Conda Package is Ready)
 
-[![Binder](binder-logo.svg)](https://mybinder.org/v2/gh/tani/xeus-haskell/main?urlpath=/lab/tree/notebooks/xeus-haskell.ipynb) -->
-
-
-
-## Documentation
-
-To get started with using `xeus-haskell`, check out the full documentation
-
-http://xeus-haskell.readthedocs.io
-
+[Jupyterlite for Haskell](https://tani.github.io/xeus-haskell)
 
 ## Dependencies
 
 `xeus-haskell` depends on
 
+- [MicroHs](https://github.com/augustss/MicroHs)
 - [xeus-zmq](https://github.com/jupyter-xeus/xeus-zmq)
 - [xtl](https://github.com/xtensor-stack/xtl)
 - [nlohmann_json](https://github.com/nlohmann/json)
