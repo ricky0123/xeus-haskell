@@ -50,7 +50,7 @@ make && make install
 
 ## Trying it online
 
-To try out xeus-haskell interactively in your web browser, just click on the binder link:
+To try out xeus-haskell interactively in your web browser, just click on the link:
 
 [Jupyterlite for Haskell](https://tani.github.io/xeus-haskell)
 
