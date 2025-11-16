@@ -148,13 +148,14 @@ namespace xeus_haskell
         const std::string  implementation = "xhaskell";
         const std::string  implementation_version = XEUS_HASKELL_VERSION;
         const std::string  language_name = "haskell";
-        const std::string  language_version = "v0.14.21.0";
+        const std::string  language_version = "v0.14.23.1";
         const std::string  language_mimetype = "text/x-haskell";;
         const std::string  language_file_extension = "hs";;
         const std::string  language_pygments_lexer = "";
         const std::string  language_codemirror_mode = "";
         const std::string  language_nbconvert_exporter = "";
-        const std::string  banner = "xhaskell";const bool         debugger = false;
+        const std::string  banner = "xhaskell";
+        const bool         debugger = false;
         
         const nl::json     help_links = nl::json::array();
 
