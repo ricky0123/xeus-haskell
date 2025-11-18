@@ -30,12 +30,17 @@ function(fetch_and_build_microhs MICROHS_BIN MICROHS_SRC_DIR)
     )
 
     ExternalProject_Get_Property(MicroHsProject SOURCE_DIR)
-    set(${MICROHS_SRC_DIR} ${SOURCE_DIR} PARENT_SCOPE)
-    set(${MICROHS_BIN} "${SOURCE_DIR}/bin/mhs${MICROHS_SUFFIX}" PARENT_SCOPE)
+    install(
+      DIRECTORY "${SOURCE_DIR}/"
+      DESTINATION "${CMAKE_INSTALL_PREFIX}/share/microhs"
+    )
+    set(MICROHS_SRC_DIR ${SOURCE_DIR} PARENT_SCOPE)
+    set(MICROHS_BIN "${SOURCE_DIR}/bin/mhs${MICROHS_SUFFIX}" PARENT_SCOPE)
 endfunction()
 
 function(build_and_install_libmhs MICROHS_BIN MICROHS_SRC_DIR)
     set(OUTPUT_HEADER "${CMAKE_CURRENT_BINARY_DIR}/Repl_stub.h")
+    set(REPL_HS "${CMAKE_CURRENT_SOURCE_DIR}/src/Repl.hs")
     set(REPL_C "${CMAKE_CURRENT_BINARY_DIR}/Repl.c")
     set(EVAL_C "${MICROHS_SRC_DIR}/src/runtime/eval.c")
     set(REPL_O "${CMAKE_CURRENT_BINARY_DIR}/Repl.o")
@@ -49,6 +54,7 @@ function(build_and_install_libmhs MICROHS_BIN MICROHS_SRC_DIR)
 
     add_custom_command(
         OUTPUT ${REPL_C} ${OUTPUT_HEADER}
+        DEPENDS ${REPL_HS}
         COMMAND ${CMAKE_COMMAND} -E env
                 "MHSDIR=${MICROHS_SRC_DIR}"
                 ${MICROHS_BIN}

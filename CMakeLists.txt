@@ -140,10 +140,6 @@ target_include_directories(mhs_repl_lib
         ${XEUS_HASKELL_INCLUDE_DIR}
 )
 
-target_compile_definitions(mhs_repl_lib
-    PUBLIC MICROHS_RUNTIME_DIR="${MICROHS_SRC_DIR}"
-)
-
 target_link_libraries(mhs_repl_lib
     PUBLIC ${MHS_OBJ}
 )
@@ -319,6 +315,7 @@ if(EMSCRIPTEN)
     target_link_options(xhaskell
       PUBLIC --bind
       PUBLIC "SHELL: -sWASMFS"
+      PUBLIC "SHELL: --pre-js ${CMAKE_CURRENT_SOURCE_DIR}/src/pre.js"
       PUBLIC "SHELL: --post-js ${CMAKE_CURRENT_SOURCE_DIR}/src/post.js"
     )
 endif()

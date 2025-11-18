@@ -22,32 +22,6 @@ namespace {
 
 bool mhs_repl_initialized = false;
 
-#ifdef MICROHS_RUNTIME_DIR
-constexpr const char* microhs_runtime_dir = MICROHS_RUNTIME_DIR;
-#else
-constexpr const char* microhs_runtime_dir = nullptr;
-#endif
-
-void ensure_microhs_environment()
-{
-    if (microhs_runtime_dir == nullptr || microhs_runtime_dir[0] == '\0')
-    {
-        return;
-    }
-
-    const char* current = std::getenv("MHSDIR");
-    if (current != nullptr && current[0] != '\0')
-    {
-        return;
-    }
-
-#ifdef _WIN32
-    _putenv_s("MHSDIR", microhs_runtime_dir);
-#else
-    setenv("MHSDIR", microhs_runtime_dir, 1);
-#endif
-}
-
 std::string capture_stdout(std::function<void()> fn) {
 #ifdef _WIN32
     // Windows implementation (Fixed to capture Win32 and C runtime stdout)
@@ -176,17 +150,30 @@ std::string capture_stdout(std::function<void()> fn) {
 } // namespace
 
 MicroHsRepl::MicroHsRepl() {
-    ensure_microhs_environment();
     if (!mhs_repl_initialized) {
         mhs_init();
         mhs_repl_initialized = true;
     }
-    context = mhs_repl_new();
 
-    // Warm up MicroHs so the first user execute doesn't pay all init costs.
+    std::string microhs_runtime_dir = "";
+    auto mhsdir = std::getenv("MHSDIR");
+    auto conda_prefix = std::getenv("CONDA_PREFIX");
+
+    if (mhsdir != nullptr) {
+      microhs_runtime_dir = mhsdir;
+    } else if (conda_prefix != nullptr) {
+      microhs_runtime_dir = std::string(conda_prefix) + "/share/microhs";
+    }
+
+    context = mhs_repl_new(
+        const_cast<char*>(microhs_runtime_dir.c_str()),
+        static_cast<uintptr_t>(microhs_runtime_dir.size())
+    );
+
     auto warmup = execute("0");
     (void)warmup;
 }
+
 
 MicroHsRepl::~MicroHsRepl() {
     mhs_repl_free(context);

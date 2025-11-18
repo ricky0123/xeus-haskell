@@ -6,6 +6,10 @@
       "{connection_file}"
   ],
   "language": "haskell",
-  "metadata": {"debugger": false
+  "metadata": {
+    "debugger": false
+  },
+  "env": {
+    "MHSDIR": "@CMAKE_INSTALL_PREFIX@/share/microhs"
   }
 }

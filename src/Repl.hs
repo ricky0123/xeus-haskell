@@ -24,7 +24,7 @@ import Foreign.Ptr (Ptr, nullPtr)
 import Foreign.StablePtr (StablePtr, newStablePtr, freeStablePtr, deRefStablePtr)
 import Foreign.Storable (poke)
 import MicroHs.Builtin (builtinMdl)
-import MicroHs.Compile (Cache, compileModuleP, compileToCombinators, emptyCache, getMhsDir)
+import MicroHs.Compile (Cache, compileModuleP, compileToCombinators, emptyCache)
 import MicroHs.CompileCache (cachedModules)
 import MicroHs.Desugar (LDef)
 import MicroHs.Exp (Exp(Var))
@@ -68,9 +68,8 @@ data ReplCtx = ReplCtx
   , rcDefs  :: [StoredDef]
   }
 
-initialCtx :: IO ReplCtx
-initialCtx = do
-  dir <- getMhsDir
+initialCtx :: String -> IO ReplCtx
+initialCtx dir = do
   let flags = defaultFlags dir
   pure ReplCtx { rcFlags = flags, rcCache = emptyCache, rcDefs = [] }
 
@@ -122,7 +121,7 @@ prettyReplError e =
 -- FFI exports
 --------------------------------------------------------------------------------
 
-foreign export ccall "mhs_repl_new"         mhsReplNew          :: IO ReplHandle
+foreign export ccall "mhs_repl_new"         mhsReplNew          :: CString -> CSize -> IO ReplHandle
 foreign export ccall "mhs_repl_free"        mhsReplFree         :: ReplHandle -> IO ()
 foreign export ccall "mhs_repl_define"      mhsReplDefine       :: ReplHandle -> CString -> CSize -> Ptr CString -> IO CInt
 foreign export ccall "mhs_repl_run"         mhsReplRun          :: ReplHandle -> CString -> CSize -> Ptr CString -> IO CInt
@@ -131,8 +130,12 @@ foreign export ccall "mhs_repl_free_cstr"   mhsReplFreeCString  :: CString -> IO
 foreign export ccall "mhs_repl_can_parse_definition" mhsReplCanParseDefinition :: CString -> CSize -> IO CInt
 foreign export ccall "mhs_repl_can_parse_expression" mhsReplCanParseExpression :: CString -> CSize -> IO CInt
 
-mhsReplNew :: IO ReplHandle
-mhsReplNew = newIORef =<< initialCtx >>= newStablePtr
+mhsReplNew :: CString -> CSize -> IO ReplHandle
+mhsReplNew cstr csize = do
+  str <- peekSource cstr csize
+  ctx <- initialCtx str
+  ref <- newIORef ctx
+  newStablePtr ref
 
 mhsReplFree :: ReplHandle -> IO ()
 mhsReplFree = freeStablePtr

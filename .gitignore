@@ -51,3 +51,5 @@ _output/
 .pixi/*
 !.pixi/config.toml
 
+.DS_Store
+.jupyterlite.doit.db
